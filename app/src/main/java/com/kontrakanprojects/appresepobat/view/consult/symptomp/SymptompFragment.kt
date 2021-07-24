@@ -1,0 +1,302 @@
+package com.kontrakanprojects.appresepobat.view.consult.symptomp
+
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.kontrakanprojects.appresepobat.R
+import com.kontrakanprojects.appresepobat.databinding.FragmentSymptompBinding
+import com.kontrakanprojects.appresepobat.model.category.SymptompCategory
+import com.kontrakanprojects.appresepobat.utils.showMessage
+import com.kontrakanprojects.appresepobat.utils.snackbar
+import com.kontrakanprojects.appresepobat.view.consult.viewmodel.SymptompViewModel
+import www.sanju.motiontoast.MotionToast
+
+class SymptompFragment : Fragment(), View.OnClickListener {
+
+    private var _binding: FragmentSymptompBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel by activityViewModels<SymptompViewModel>()
+    private lateinit var symptompAdapter: SymptompAdapter
+    private var listSelectedIds = ArrayList<String>()
+    private var listSelectedSymptomps =
+        ArrayList<com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms>()
+    private lateinit var data: com.kontrakanprojects.appresepobat.model.consult.ResultConsult
+    private lateinit var categories: ArrayList<com.kontrakanprojects.appresepobat.model.category.SymptompCategory>
+    private var index = 0
+    private var numSelectedSymptomps = 0
+
+    private val TAG = SymptompFragment::class.simpleName
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSymptompBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViews()
+        // ambil data dari navigation
+        data = SymptompFragmentArgs.fromBundle(arguments as Bundle).resultConsult
+    }
+
+    private fun initViews() {
+        setToolbar()
+
+        symptompAdapter = SymptompAdapter()
+        categories = ArrayList()
+        with(binding) {
+            btnSymptompNext.setOnClickListener(this@SymptompFragment)
+            btnSymptompPrevious.setOnClickListener(this@SymptompFragment)
+            btnSymptompDiagnosis.setOnClickListener(this@SymptompFragment)
+            with(rvSymptompList) {
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true)
+                this.adapter = symptompAdapter
+            }
+        }
+        loadCategory()
+    }
+
+    private fun prepareViews() {
+        with(binding) {
+            //show-hide buttons based category index
+            when (index) {
+                0 -> btnSymptompPrevious.visibility = View.INVISIBLE
+                categories.size - 1 -> {
+                    btnSymptompDiagnosis.visibility = View.VISIBLE
+                    btnSymptompPrevious.visibility = View.VISIBLE
+                    btnSymptompNext.visibility = View.GONE
+                }
+                else -> {
+                    btnSymptompPrevious.visibility = View.VISIBLE
+                    btnSymptompNext.visibility = View.VISIBLE
+                    btnSymptompDiagnosis.visibility = View.GONE
+                }
+            }
+            setTitle(categories[index].gejalaKategori.toString())
+        }
+
+        symptompAdapter.setOnItemClickCallback(object : SymptompAdapter.OnItemClickCallback {
+            override fun onItemSelected(symptom: com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms) {
+                //store checked id and remove in listUnselected if exist
+                symptom.isSelected = true
+                listSelectedIds.add(symptom.idGejala.toString())
+                listSelectedSymptomps.add(symptom)
+                numSelectedSymptomps++
+                Log.d(TAG, "onItemSelected: $symptom telah ditambahkan")
+                Log.d(TAG, "onItemSelected: $listSelectedIds isi setelah ditambahkan")
+                Log.d(
+                    TAG,
+                    "onItemSelected: $listSelectedSymptomps isi setelah ditambahkan di kategori"
+                )
+            }
+
+            override fun onItemUnSelected(symptom: com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms) {
+                //remove stored id in listSelected when unchecked and store in listUnselected
+                symptom.isSelected = false
+                listSelectedIds.remove(symptom.idGejala ?: "")
+                listSelectedSymptomps.remove(symptom)
+                numSelectedSymptomps--
+                Log.d(TAG, "onItemSelected: $symptom telah dihapus")
+                Log.d(TAG, "onItemSelected: $listSelectedIds isi setelah dihapus")
+                Log.d(
+                    TAG,
+                    "onItemSelected: $listSelectedSymptomps isi setelah dihapus di kategori"
+                )
+            }
+        })
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btn_symptomp_next -> {
+                if (hasSelectingAnySymptomp()) nextCategory()
+            }
+            R.id.btn_symptomp_previous -> {
+                if (hasSelectingAnySymptomp()) previousCategory()
+            }
+            R.id.btn_symptomp_diagnosis -> {
+                if (hasSelectingAnySymptomp()) {
+                    saveSymptomp(listSelectedIds, data.idKonsultasi.toString())
+                    moveToResultDiagnosis(data.idKonsultasi.toString())
+                    storeSelectedDataTemp()
+                }
+                Log.d(TAG, "onClick: $index => index terakhir")
+                Log.d(TAG, "onClick: $listSelectedIds , isi list yang sudah dipilih")
+            }
+        }
+    }
+
+    private fun hasSelectingAnySymptomp(): Boolean {
+        var state = false
+        if (numSelectedSymptomps == 0) {
+            binding.root.snackbar("Ada memilih setidaknya satu gejala.")
+        } else {
+            state = true
+        }
+        return state
+    }
+
+    private fun storeSelectedDataTemp() {
+        viewModel.setSelectedIdsSymtomps(listSelectedIds)
+        viewModel.setSelectedSymptomps(listSelectedSymptomps)
+    }
+
+    private fun moveToResultDiagnosis(idConsult: String) {
+        val toResultDiagnosis =
+            SymptompFragmentDirections.actionSymptompFragmentToResultFragment(idConsult)
+        findNavController().navigate(toResultDiagnosis)
+    }
+
+    private fun nextCategory() {
+        index++
+        numSelectedSymptomps = 0
+        if (index != categories.size) getSymptopByCategory(categories[index].idGejalaKategori.toString())
+    }
+
+    private fun previousCategory() {
+        index--
+        numSelectedSymptomps = 0
+        if (index != -1) getSymptopByCategory(categories[index].idGejalaKategori.toString())
+    }
+
+    private fun loadCategory() {
+        viewModel.getCategories().observe(viewLifecycleOwner, {
+            if (it != null) {
+                if (it.code == 200) {
+                    //store in arraylist
+                    categories.addAll(it.result as ArrayList<SymptompCategory>)
+                    //force to load data the first symptomp category
+                    getSymptopByCategory(categories[index].idGejalaKategori.toString())
+                    //prepareViews
+                    prepareViews()
+                } else {
+                    showMessage(
+                        requireActivity(),
+                        getString(R.string.message_title_failed),
+                        it.message.toString(),
+                        style = MotionToast.TOAST_ERROR
+                    )
+                }
+            } else {
+                showMessage(
+                    requireActivity(),
+                    getString(R.string.message_title_failed),
+                    style = MotionToast.TOAST_ERROR
+                )
+            }
+        })
+    }
+
+    private fun getSymptopByCategory(idGejalaKategori: String) {
+        viewModel.getSymptomp(idGejalaKategori, data.idKonsultasi.toString())
+            .observe(viewLifecycleOwner, {
+                if (it != null) {
+                    if (it.code == 200) {
+                        // jika dia kembali maka check user saat checklis item sebelumnya
+                        // dengan cara mengecek data result yang sudah ditambahkan
+                        // check dulu jika user ada memilih gejala
+                        listSelectedIds.forEachIndexed { _, idGejala ->
+                            it.result!!.forEach { resultSymptoms ->
+                                if (resultSymptoms.idGejala == idGejala) {
+                                    resultSymptoms.isSelected = true
+                                    numSelectedSymptomps++
+                                    Log.d(
+                                        TAG,
+                                        "getSymptopByCategory: Dijalankan karena dipilih $resultSymptoms"
+                                    )
+                                }
+                            }
+                        }
+
+                        symptompAdapter.setData(it.result)
+                        prepareViews()
+                    } else {
+                        showMessage(
+                            requireActivity(),
+                            getString(R.string.message_title_failed),
+                            it.message,
+                            style = MotionToast.TOAST_ERROR
+                        )
+                    }
+                } else {
+                    showMessage(
+                        requireActivity(),
+                        getString(R.string.message_title_failed),
+                        style = MotionToast.TOAST_ERROR
+                    )
+                }
+            })
+    }
+
+    private fun saveSymptomp(
+        listSelectedSymptoms: ArrayList<String>,
+        idKonsultasi: String
+    ) {
+        viewModel.symptompConsult(listSelectedSymptoms, idKonsultasi).observe(viewLifecycleOwner, {
+            if (it != null) {
+                if (it.code == 200) {
+                    showMessage(
+                        requireActivity(),
+                        getString(R.string.message_title_succes),
+                        it.message ?: "",
+                        style = MotionToast.TOAST_SUCCESS
+                    )
+                } else {
+                    showMessage(
+                        requireActivity(),
+                        getString(R.string.message_title_failed),
+                        it.message ?: "",
+                        style = MotionToast.TOAST_ERROR
+                    )
+                }
+            } else {
+                showMessage(
+                    requireActivity(),
+                    getString(R.string.message_title_failed),
+                    style = MotionToast.TOAST_ERROR
+                )
+            }
+        })
+    }
+
+    private fun setToolbar() {
+        (activity as AppCompatActivity?)!!.setSupportActionBar(binding.toolbar)
+        if ((activity as AppCompatActivity?)!!.supportActionBar != null) {
+            (activity as AppCompatActivity?)!!.supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
+    private fun setTitle(titleGejala: String) {
+        if ((activity as AppCompatActivity?)!!.supportActionBar != null) {
+            (activity as AppCompatActivity?)!!.supportActionBar!!.title =
+                "Kategori Gejala $titleGejala"
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) findNavController().navigateUp()
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+}
