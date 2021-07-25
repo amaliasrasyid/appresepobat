@@ -98,17 +98,7 @@ fun isLoadingImage(state: Boolean, pb: ProgressBar) {
     }
 }
 
-// loading in bottomsheet
-private fun loadingInBottomSheet(
-    btnSave: MaterialButton,
-    progressBarSheet: ProgressBar,
-    isLoading: Boolean
-) {
-    if (isLoading) {
-        btnSave.visibility = View.INVISIBLE
-        progressBarSheet.visibility = View.VISIBLE
-    } else {
-        btnSave.visibility = View.GONE
-        progressBarSheet.visibility = View.GONE
-    }
+fun convertToArrString(data: ArrayList<String>): Array<String> {
+    var array = arrayOfNulls<String>(data.size)
+    return data.toArray(array)
 }

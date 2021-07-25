@@ -31,12 +31,12 @@
         android:name="com.kontrakanprojects.appresepobat.view.consult.symptomp.SymptompFragment"
         android:label="fragment_symptomp"
         tools:layout="@layout/fragment_symptomp">
-        <action
-            android:id="@+id/action_symptompFragment_to_resultFragment"
-            app:destination="@+id/resultFragment" />
         <argument
             android:name="resultConsult"
             app:argType="com.kontrakanprojects.appresepobat.model.consult.ResultConsult" />
+        <action
+            android:id="@+id/action_symptompFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
     </fragment>
     <activity
         android:id="@+id/infoActivity"
@@ -58,5 +58,8 @@
         <argument
             android:name="idConsultation"
             app:argType="string" />
+        <argument
+            android:name="listSelectedIds"
+            app:argType="string[]" />
     </fragment>
 </navigation>

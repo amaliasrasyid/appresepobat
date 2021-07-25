@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kontrakanprojects.appresepobat.R
 import com.kontrakanprojects.appresepobat.databinding.FragmentDaftarSolusiBinding
+import com.kontrakanprojects.appresepobat.model.solution.Solution
 import com.kontrakanprojects.appresepobat.utils.EXTRA_OBJECT_TYPE
 import com.kontrakanprojects.appresepobat.utils.dataNotFound
 import com.kontrakanprojects.appresepobat.utils.isLoading
@@ -63,9 +64,9 @@ class DaftarSolusiFragment : Fragment() {
             observeSolutions()
             solutionAdapter.setOnItemClickCallBack(object :
                 DaftarSolusiAdapter.OnItemClickCallBack {
-                override fun onItemClicked(solution: com.kontrakanprojects.appresepobat.model.solution.Solution) {
+                override fun onItemClicked(solution: Solution) {
                     // send to db parcel
-                    val dataSolution = com.kontrakanprojects.appresepobat.model.solution.Solution(
+                    val dataSolution = Solution(
                         solution.keterangan,
                         solution.idSolusi,
                         solution.kdSolusi,

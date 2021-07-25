@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.kontrakanprojects.appresepobat.R
 import com.kontrakanprojects.appresepobat.databinding.FragmentSymptompBinding
 import com.kontrakanprojects.appresepobat.model.category.SymptompCategory
+import com.kontrakanprojects.appresepobat.model.consult.ResultConsult
+import com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms
+import com.kontrakanprojects.appresepobat.utils.convertToArrString
 import com.kontrakanprojects.appresepobat.utils.showMessage
 import com.kontrakanprojects.appresepobat.utils.snackbar
 import com.kontrakanprojects.appresepobat.view.consult.viewmodel.SymptompViewModel
@@ -27,9 +30,9 @@ class SymptompFragment : Fragment(), View.OnClickListener {
     private lateinit var symptompAdapter: SymptompAdapter
     private var listSelectedIds = ArrayList<String>()
     private var listSelectedSymptomps =
-        ArrayList<com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms>()
-    private lateinit var data: com.kontrakanprojects.appresepobat.model.consult.ResultConsult
-    private lateinit var categories: ArrayList<com.kontrakanprojects.appresepobat.model.category.SymptompCategory>
+        ArrayList<ResultSymptoms>()
+    private lateinit var data: ResultConsult
+    private lateinit var categories: ArrayList<SymptompCategory>
     private var index = 0
     private var numSelectedSymptomps = 0
 
@@ -93,7 +96,7 @@ class SymptompFragment : Fragment(), View.OnClickListener {
         }
 
         symptompAdapter.setOnItemClickCallback(object : SymptompAdapter.OnItemClickCallback {
-            override fun onItemSelected(symptom: com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms) {
+            override fun onItemSelected(symptom: ResultSymptoms) {
                 //store checked id and remove in listUnselected if exist
                 symptom.isSelected = true
                 listSelectedIds.add(symptom.idGejala.toString())
@@ -107,7 +110,7 @@ class SymptompFragment : Fragment(), View.OnClickListener {
                 )
             }
 
-            override fun onItemUnSelected(symptom: com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms) {
+            override fun onItemUnSelected(symptom: ResultSymptoms) {
                 //remove stored id in listSelected when unchecked and store in listUnselected
                 symptom.isSelected = false
                 listSelectedIds.remove(symptom.idGejala ?: "")
@@ -134,7 +137,10 @@ class SymptompFragment : Fragment(), View.OnClickListener {
             R.id.btn_symptomp_diagnosis -> {
                 if (hasSelectingAnySymptomp()) {
                     saveSymptomp(listSelectedIds, data.idKonsultasi.toString())
-                    moveToResultDiagnosis(data.idKonsultasi.toString())
+                    moveToResultDiagnosis(
+                        data.idKonsultasi.toString(),
+                        convertToArrString(listSelectedIds)
+                    )
                     storeSelectedDataTemp()
                 }
                 Log.d(TAG, "onClick: $index => index terakhir")
@@ -158,9 +164,11 @@ class SymptompFragment : Fragment(), View.OnClickListener {
         viewModel.setSelectedSymptomps(listSelectedSymptomps)
     }
 
-    private fun moveToResultDiagnosis(idConsult: String) {
-        val toResultDiagnosis =
-            SymptompFragmentDirections.actionSymptompFragmentToResultFragment(idConsult)
+    private fun moveToResultDiagnosis(idConsult: String, listSelectedIds: Array<String>) {
+        val toResultDiagnosis = SymptompFragmentDirections.actionSymptompFragmentToResultFragment(
+            idConsult,
+            listSelectedIds
+        )
         findNavController().navigate(toResultDiagnosis)
     }
 

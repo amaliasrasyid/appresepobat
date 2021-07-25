@@ -13,7 +13,7 @@ class ApiConfig {
         const val URL = "http://192.168.43.174:8080"
 
         private const val ENDPOINT =
-            "${com.kontrakanprojects.appresepobat.network.ApiConfig.Companion.URL}/api/"
+            "${URL}/api/"
 
         private fun client(): OkHttpClient {
             val logging = HttpLoggingInterceptor()
@@ -23,13 +23,13 @@ class ApiConfig {
                 .build()
         }
 
-        fun getApiService(): com.kontrakanprojects.appresepobat.network.ApiService {
+        fun getApiService(): ApiService {
             val retrofit = Retrofit.Builder()
-                .baseUrl(com.kontrakanprojects.appresepobat.network.ApiConfig.Companion.ENDPOINT)
+                .baseUrl(ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(com.kontrakanprojects.appresepobat.network.ApiConfig.Companion.client())
+                .client(client())
                 .build()
-            return retrofit.create(com.kontrakanprojects.appresepobat.network.ApiService::class.java)
+            return retrofit.create(ApiService::class.java)
         }
     }
 }

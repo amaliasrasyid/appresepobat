@@ -5,61 +5,65 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
+import com.kontrakanprojects.appresepobat.model.consult.ResponseConsult
+import com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution
+import com.kontrakanprojects.appresepobat.model.result.ResponseResult
+import com.kontrakanprojects.appresepobat.network.ApiConfig
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class ResultViewModel : ViewModel() {
-    private var _result: MutableLiveData<com.kontrakanprojects.appresepobat.model.result.ResponseResult>? =
+    private var _result: MutableLiveData<ResponseResult>? =
         null
-    private var _solutions: MutableLiveData<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution>? =
+    private var _solutions: MutableLiveData<ResponseDiseaseSolution>? =
         null
-    private var _consult: MutableLiveData<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult>? =
+    private var _consult: MutableLiveData<ResponseConsult>? =
         null
 
 
-    fun result(idConsult: String): LiveData<com.kontrakanprojects.appresepobat.model.result.ResponseResult> {
+    fun result(idConsult: String, listSelectedIds: Array<String>): LiveData<ResponseResult> {
         _result = MutableLiveData()
-        getResult(idConsult)
-        return _result as MutableLiveData<com.kontrakanprojects.appresepobat.model.result.ResponseResult>
+        getResult(idConsult, listSelectedIds)
+        return _result as MutableLiveData<ResponseResult>
     }
 
-    fun solutions(idDisease: String): LiveData<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution> {
+    fun solutions(idDisease: String): LiveData<ResponseDiseaseSolution> {
         _solutions = MutableLiveData()
         getSolutions(idDisease)
-        return _solutions as MutableLiveData<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution>
+        return _solutions as MutableLiveData<ResponseDiseaseSolution>
     }
 
 
-    fun resetingConsult(idConsult: String): LiveData<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult> {
+    fun resetingConsult(idConsult: String): LiveData<ResponseConsult> {
         _consult = MutableLiveData()
         resetConsult(idConsult)
-        return _consult as MutableLiveData<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult>
+        return _consult as MutableLiveData<ResponseConsult>
     }
 
 
     private fun getSolutions(idDisease: String) {
-        val client = com.kontrakanprojects.appresepobat.network.ApiConfig.getApiService()
+        val client = ApiConfig.getApiService()
             .detailDisease(idDisease)
         client.enqueue(object :
-            Callback<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution> {
+            Callback<ResponseDiseaseSolution> {
             override fun onResponse(
-                call: Call<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution>,
-                response: Response<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution>
+                call: Call<ResponseDiseaseSolution>,
+                response: Response<ResponseDiseaseSolution>
             ) {
                 if (response.isSuccessful) {
                     _solutions?.postValue(response.body())
                 } else {
                     val gson = Gson().fromJson(
                         response.errorBody()?.string(),
-                        com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution::class.java
+                        ResponseDiseaseSolution::class.java
                     )
                     _solutions?.postValue(gson)
                 }
             }
 
             override fun onFailure(
-                call: Call<com.kontrakanprojects.appresepobat.model.disease.ResponseDiseaseSolution>,
+                call: Call<ResponseDiseaseSolution>,
                 t: Throwable
             ) {
                 _solutions?.postValue(null)
@@ -68,14 +72,14 @@ class ResultViewModel : ViewModel() {
         })
     }
 
-    private fun getResult(idConsult: String) {
-        val client = com.kontrakanprojects.appresepobat.network.ApiConfig.getApiService()
-            .resultConsult(idConsult)
+    private fun getResult(idConsult: String, listSelectedIds: Array<String>) {
+        val client = ApiConfig.getApiService()
+            .resultConsult(idConsult, listSelectedIds)
         client.enqueue(object :
-            Callback<com.kontrakanprojects.appresepobat.model.result.ResponseResult> {
+            Callback<ResponseResult> {
             override fun onResponse(
-                call: Call<com.kontrakanprojects.appresepobat.model.result.ResponseResult>,
-                response: Response<com.kontrakanprojects.appresepobat.model.result.ResponseResult>
+                call: Call<ResponseResult>,
+                response: Response<ResponseResult>
             ) {
                 if (response.isSuccessful) {
                     _result?.postValue(response.body())
@@ -83,14 +87,14 @@ class ResultViewModel : ViewModel() {
                     val gson =
                         Gson().fromJson(
                             response.errorBody()?.string(),
-                            com.kontrakanprojects.appresepobat.model.result.ResponseResult::class.java
+                            ResponseResult::class.java
                         )
                     _result?.postValue(gson)
                 }
             }
 
             override fun onFailure(
-                call: Call<com.kontrakanprojects.appresepobat.model.result.ResponseResult>,
+                call: Call<ResponseResult>,
                 t: Throwable
             ) {
                 _result?.postValue(null)
@@ -100,27 +104,27 @@ class ResultViewModel : ViewModel() {
     }
 
     private fun resetConsult(idConsult: String) {
-        val client = com.kontrakanprojects.appresepobat.network.ApiConfig.getApiService()
+        val client = ApiConfig.getApiService()
             .resetConsult(idConsult)
         client.enqueue(object :
-            Callback<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult> {
+            Callback<ResponseConsult> {
             override fun onResponse(
-                call: Call<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult>,
-                response: Response<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult>
+                call: Call<ResponseConsult>,
+                response: Response<ResponseConsult>
             ) {
                 if (response.isSuccessful) {
                     _consult?.postValue(response.body())
                 } else {
                     val error = Gson().fromJson(
                         response.errorBody()?.string(),
-                        com.kontrakanprojects.appresepobat.model.consult.ResponseConsult::class.java
+                        ResponseConsult::class.java
                     )
                     _consult?.postValue(error)
                 }
             }
 
             override fun onFailure(
-                call: Call<com.kontrakanprojects.appresepobat.model.consult.ResponseConsult>,
+                call: Call<ResponseConsult>,
                 t: Throwable
             ) {
                 _consult?.postValue(null)

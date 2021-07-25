@@ -22,6 +22,8 @@ class ResultFragment : Fragment() {
     private val viewModel by activityViewModels<ResultViewModel>()
     private lateinit var resultAdapter: ResultAdapter
     private lateinit var dataIdConsult: String
+    private lateinit var dataSelectedIds: Array<String>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +56,9 @@ class ResultFragment : Fragment() {
         }
         //data from navigation
         dataIdConsult = ResultFragmentArgs.fromBundle(arguments as Bundle).idConsultation
+        dataSelectedIds = ResultFragmentArgs.fromBundle(arguments as Bundle).listSelectedIds
 
-        observeResult(dataIdConsult)
+        observeResult(dataIdConsult, dataSelectedIds)
     }
 
     private fun backToConsultation() {
@@ -67,8 +70,8 @@ class ResultFragment : Fragment() {
         findNavController().navigate(R.id.action_resultFragment_to_homeFragment)
     }
 
-    private fun observeResult(idConsult: String) {
-        viewModel.result(idConsult).observe(viewLifecycleOwner, {
+    private fun observeResult(idConsult: String, listSelectedIds: Array<String>) {
+        viewModel.result(idConsult, listSelectedIds).observe(viewLifecycleOwner, {
             isLoading(false, binding.progressBarResult)
             if (it != null) {
                 if (it.code == 200) {

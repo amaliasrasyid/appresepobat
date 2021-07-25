@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class ResponseSymptomConsult(
 
     @field:SerializedName("result")
-    val result: List<com.kontrakanprojects.appresepobat.model.symptoms_consult.ResultSymptompConsult?>? = null,
+    val result: List<ResultSymptompConsult>? = null,
 
     @field:SerializedName("code")
     val code: Int? = null,
@@ -23,7 +23,7 @@ data class ResultSymptompConsult(
     val idKonsultasi: String? = null,
 
     @field:SerializedName("symptomp")
-    val symptomp: com.kontrakanprojects.appresepobat.model.symptoms_consult.Symptomp? = null,
+    val symptomp: Symptomp? = null,
 
     @field:SerializedName("status")
     val status: String? = null
