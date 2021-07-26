@@ -38,9 +38,10 @@ class ResultAdapter : RecyclerView.Adapter<ResultAdapter.ResultViewHolder>() {
     }
 
     private fun convertToPercent(nilai: String?): String? {
+        val roundedValue = String.format(Locale.ENGLISH, "%.2f", nilai?.toBigDecimal()).toDouble()
 
         val stringbuilder = StringBuilder()
-        stringbuilder.append(nilai)
+        stringbuilder.append(roundedValue.toInt().toString())
         stringbuilder.append("%")
 
         return stringbuilder.toString()
