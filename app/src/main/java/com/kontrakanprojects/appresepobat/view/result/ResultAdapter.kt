@@ -3,28 +3,33 @@ package com.kontrakanprojects.appresepobat.view.result
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.kontrakanprojects.appresepobat.R
 import com.kontrakanprojects.appresepobat.databinding.ResultItemBinding
+import com.kontrakanprojects.appresepobat.model.disease.Disease
+import com.kontrakanprojects.appresepobat.model.result.ResultItem
+import com.kontrakanprojects.appresepobat.network.ApiConfig
 import java.util.*
 import kotlin.collections.ArrayList
 
 class ResultAdapter : RecyclerView.Adapter<ResultAdapter.ResultViewHolder>() {
-    private val listResult = ArrayList<com.kontrakanprojects.appresepobat.model.result.ResultItem>()
-    private var diseaseResult: com.kontrakanprojects.appresepobat.model.disease.Disease? = null
+    private val listResult = ArrayList<ResultItem>()
+    private var diseaseResult: Disease? = null
 
-    fun setData(result: List<com.kontrakanprojects.appresepobat.model.result.ResultItem>?) {
+    fun setData(result: List<ResultItem>?) {
         if (result == null) return
         this.listResult.clear()
         this.listResult.addAll(result)
         notifyDataSetChanged()
     }
 
-    fun getDiseaseDiagnosis(): com.kontrakanprojects.appresepobat.model.disease.Disease? {
+    fun getDiseaseDiagnosis(): Disease? {
         selectedDisease()
         return diseaseResult
     }
 
     private fun selectedDisease() {
-        var selected: com.kontrakanprojects.appresepobat.model.disease.Disease? = null
+        var selected: Disease? = null
         var value = 0.0
         listResult.forEach {
             val matchValue =
@@ -62,11 +67,17 @@ class ResultAdapter : RecyclerView.Adapter<ResultAdapter.ResultViewHolder>() {
 
     inner class ResultViewHolder(private val binding: ResultItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(resultItem: com.kontrakanprojects.appresepobat.model.result.ResultItem) {
+        fun bind(resultItem: ResultItem) {
             with(binding) {
-//                tvResultCaseName.text = resultItem.caseMethod?.nama
+                tvResultMedicine.text = resultItem.medicine?.nmObat
                 tvResultDiseaseName.text = resultItem.disease?.nmPenyakit
                 tvResultMatchingCount.text = convertToPercent(resultItem.nilai)
+
+                Glide.with(itemView.context)
+                    .load(ApiConfig.ENDPOINT_IMAGES + resultItem.medicine?.gambar)
+                    .placeholder(R.drawable.img_not_found)
+                    .error(R.drawable.img_not_found)
+                    .into(imgResultMedicine)
             }
         }
     }

@@ -79,17 +79,36 @@ class SymptompFragment : Fragment(), View.OnClickListener {
     private fun prepareViews() {
         with(binding) {
             //show-hide buttons based category index
-            when (index) {
-                0 -> btnSymptompPrevious.visibility = View.INVISIBLE
-                categories.size - 1 -> {
-                    btnSymptompDiagnosis.visibility = View.VISIBLE
-                    btnSymptompPrevious.visibility = View.VISIBLE
-                    btnSymptompNext.visibility = View.GONE
+            /** Condition Button
+             * 1. list != 1
+             * a. 0 = prev invisible
+             * b. length-1 = prev visible and save visibile
+             * c. between it = prev visible, save invisible, next visible
+             * 2. list == 1
+             * a. 0 = prev invisible, save visible, next invisible
+             * */
+
+            if (categories.size == 1) {
+                when (index) {
+                    0 -> {
+                        btnSymptompDiagnosis.visibility = View.VISIBLE
+                        btnSymptompPrevious.visibility = View.INVISIBLE
+                        btnSymptompNext.visibility = View.GONE
+                    }
                 }
-                else -> {
-                    btnSymptompPrevious.visibility = View.VISIBLE
-                    btnSymptompNext.visibility = View.VISIBLE
-                    btnSymptompDiagnosis.visibility = View.GONE
+            } else {
+                when (index) {
+                    0 -> btnSymptompPrevious.visibility = View.INVISIBLE
+                    categories.size - 1 -> {
+                        btnSymptompDiagnosis.visibility = View.VISIBLE
+                        btnSymptompPrevious.visibility = View.VISIBLE
+                        btnSymptompNext.visibility = View.GONE
+                    }
+                    else -> {
+                        btnSymptompPrevious.visibility = View.VISIBLE
+                        btnSymptompNext.visibility = View.VISIBLE
+                        btnSymptompDiagnosis.visibility = View.GONE
+                    }
                 }
             }
             setTitle(categories[index].gejalaKategori.toString())
@@ -102,12 +121,6 @@ class SymptompFragment : Fragment(), View.OnClickListener {
                 listSelectedIds.add(symptom.idGejala.toString())
                 listSelectedSymptomps.add(symptom)
                 numSelectedSymptomps++
-                Log.d(TAG, "onItemSelected: $symptom telah ditambahkan")
-                Log.d(TAG, "onItemSelected: $listSelectedIds isi setelah ditambahkan")
-                Log.d(
-                    TAG,
-                    "onItemSelected: $listSelectedSymptomps isi setelah ditambahkan di kategori"
-                )
             }
 
             override fun onItemUnSelected(symptom: ResultSymptoms) {
@@ -116,12 +129,6 @@ class SymptompFragment : Fragment(), View.OnClickListener {
                 listSelectedIds.remove(symptom.idGejala ?: "")
                 listSelectedSymptomps.remove(symptom)
                 numSelectedSymptomps--
-                Log.d(TAG, "onItemSelected: $symptom telah dihapus")
-                Log.d(TAG, "onItemSelected: $listSelectedIds isi setelah dihapus")
-                Log.d(
-                    TAG,
-                    "onItemSelected: $listSelectedSymptomps isi setelah dihapus di kategori"
-                )
             }
         })
     }
@@ -143,8 +150,6 @@ class SymptompFragment : Fragment(), View.OnClickListener {
                     )
                     storeSelectedDataTemp()
                 }
-                Log.d(TAG, "onClick: $index => index terakhir")
-                Log.d(TAG, "onClick: $listSelectedIds , isi list yang sudah dipilih")
             }
         }
     }
@@ -173,13 +178,13 @@ class SymptompFragment : Fragment(), View.OnClickListener {
     }
 
     private fun nextCategory() {
-        index++
+        if (categories.size != 1) index++
         numSelectedSymptomps = 0
         if (index != categories.size) getSymptopByCategory(categories[index].idGejalaKategori.toString())
     }
 
     private fun previousCategory() {
-        index--
+        if (categories.size != 1) index--
         numSelectedSymptomps = 0
         if (index != -1) getSymptopByCategory(categories[index].idGejalaKategori.toString())
     }

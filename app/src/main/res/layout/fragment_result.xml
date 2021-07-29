@@ -40,8 +40,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/dimen_16"
-            android:nestedScrollingEnabled="true"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
             android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialDivider"
@@ -59,11 +61,11 @@
             app:layout_constraintTop_toBottomOf="@+id/rv_result_case"
             tools:text="Hasil diagnosa anda adalah Enosimania adalah tekanan untuk berpikir bahwa dirinya telah melakukan kesalahan yang tidak bisa dimaafkan atau taku akan kritirkan" />
 
+
         <TextView
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_16"
             android:text="@string/label_solusi"
             android:textColor="@color/grey"
             android:textSize="21sp"
@@ -73,7 +75,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_result_description" />
 
         <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/materialDivider2"
+            android:id="@+id/materialDivider3"
             android:layout_width="100dp"
             android:layout_height="3dp"
             android:layout_marginTop="@dimen/dimen_8"
@@ -87,12 +89,12 @@
             android:id="@+id/listview_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_16"
+            android:layout_marginTop="16dp"
             android:nestedScrollingEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialDivider2"
+            app:layout_constraintTop_toBottomOf="@+id/textView7"
             tools:listitem="@tools:sample/lorem" />
 
         <ProgressBar

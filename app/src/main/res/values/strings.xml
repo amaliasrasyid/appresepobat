@@ -132,4 +132,6 @@
     <string name="text_guide_consultation">Silahkan memasukkan nama untuk memulai konsultasi.</string>
     <string name="label_consultation">Buat Konsultasi</string>
     <string name="label_solution">Solusi</string>
+    <string name="label_medicine">Obat</string>
+    <string name="label_disease">Penyakit</string>
 </resources>

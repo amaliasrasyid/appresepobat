@@ -9,12 +9,7 @@ class SymptompAdapter : RecyclerView.Adapter<SymptompAdapter.SymptompViewHolder>
     private val listSymptomp =
         ArrayList<com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms>()
 
-    //    private val listSelectedSymptomp = ArrayList<ResultSymptoms>()
     private var onItemClickCallback: OnItemClickCallback? = null
-
-    fun setSelectedSymtomp() {
-
-    }
 
     fun setData(listSymptomp: List<com.kontrakanprojects.appresepobat.model.symptoms.ResultSymptoms>?) {
         if (listSymptomp == null) return

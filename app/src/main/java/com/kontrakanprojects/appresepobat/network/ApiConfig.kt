@@ -10,10 +10,11 @@ class ApiConfig {
         // local url
         //192.168.43.174:8080
         //"http://127.0.0.1:8080"
-        const val URL = "https://resepobat.rproject-dev.com/"
+        const val URL = "https://resepobat.rproject-dev.com"
 
         private const val ENDPOINT =
-            "${URL}/api/"
+            "${URL}/api_wcbr/api/"
+        const val ENDPOINT_IMAGES = "$URL/"
 
         private fun client(): OkHttpClient {
             val logging = HttpLoggingInterceptor()
