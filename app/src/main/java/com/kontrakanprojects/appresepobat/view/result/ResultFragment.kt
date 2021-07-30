@@ -49,7 +49,8 @@ class ResultFragment : Fragment() {
             buttonResultFinish.setOnClickListener { finishConsultation() }
             resultAdapter = ResultAdapter()
             with(rvResultCase) {
-                layoutManager = LinearLayoutManager(requireContext())
+                layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 setHasFixedSize(true)
                 this.adapter = resultAdapter
             }
